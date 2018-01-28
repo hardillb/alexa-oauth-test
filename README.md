@@ -2,8 +2,7 @@
 
 A sample app to test how the Alexa Home Skill system interacts with a oAuth provider.
 
-Everything seams to work apart from getting a new token using the refreshToken
-
+Everything seams to work apart from getting a new token using the refreshToken. 
 ## Setup
 
 There are 3 parts to the setup:
@@ -89,5 +88,6 @@ Copy and past the content of lambda.js into the code section and save.
 
 Once all the setup is complete then you should see the skill available under "DEV SKILLS" in the  "Your skills" area of the Alexa mobile app. If you've got everything working you should be able to enable the app and it will redirect you to the web app to sign in. Use the admin user with the password you created earlier. After discover completes you should have a new device called "Test Device". Any interaction with this device should raise a "EXPIRED_AUTHORIZATION_CREDENTIAL" error.
 
-This should trigger the Alexa system to request a new token, but if you watch thet output from the web app you will see this never happens.
- 
+This should trigger the Alexa system to request a new token, but if you watch thet output from the web app you will see this never happens. 
+
+The web app hands out tokens with a 10 minute life, but we don't actually need this to test as the Alexa should try to refesh as soon as it gets the error. I know the error generation should be working because if I change the error to "ENDPOINT_LOW_POWER" I get a warning about a low battery.
