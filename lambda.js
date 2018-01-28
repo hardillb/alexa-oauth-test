@@ -1,4 +1,5 @@
 exports.handler = function (request, context) {
+    //log("DEBUG:", "start ", JSON.stringify(request));
     if (request.directive.header.namespace === 'Alexa.Discovery' && request.directive.header.name === 'Discover') {
         log("DEBUG:", "Discover request",  JSON.stringify(request));
         handleDiscovery(request, context, "");
@@ -8,6 +9,10 @@ exports.handler = function (request, context) {
             log("DEBUG:", "TurnOn or TurnOff Request", JSON.stringify(request));
             handlePowerControl(request, context);
         }
+    }
+    else if (request.directive.header.name === 'ReportState') {
+        log("DEBUG", "ReportState", JSON.stringify(request))
+        reportState(request, context);
     }
 
     function handleDiscovery(request, context) {
@@ -21,10 +26,6 @@ exports.handler = function (request, context) {
                     "description": "Smart Device Switch",
                     "displayCategories": ["SWITCH"],
                     "cookie": {
-                        "key1": "arbitrary key/value pairs for skill to reference this endpoint.",
-                        "key2": "There can be multiple entries",
-                        "key3": "but they should only be used for reference purposes.",
-                        "key4": "This is not a suitable place to maintain current endpoint state."
                     },
                     "capabilities":
                     [
@@ -41,7 +42,7 @@ exports.handler = function (request, context) {
                                 "supported": [{
                                     "name": "powerState"
                                 }],
-                                 "retrievable": true
+                                 "retrievable": false
                             }
                         }
                     ]
@@ -57,12 +58,37 @@ exports.handler = function (request, context) {
     function log(message, message1, message2) {
         console.log(message + message1 + message2);
     }
+    
+    function reportState(request, context) {
+        
+        log("DEBUG:", " starting ", JSON.stringify(request));
+        
+        var responseHeader = request.directive.header;
+        responseHeader.namespace = "Alexa";
+        responseHeader.name = "ErrorResponse";
+
+        var response = {
+            event: {
+                header: responseHeader,
+                endpoint: request.directive.endpoint,
+                payload: {
+                    type: "EXPIRED_AUTHORIZATION_CREDENTIAL",
+                    message: "oAuth token expired"
+                }
+            }
+        };
+
+        log("DEBUG", "ReportState ", JSON.stringify(response));
+
+        context.succeed(response);
+        
+    }
 
     function handlePowerControl(request, context) {
         // get device ID passed in during discovery
         var requestMethod = request.directive.header.name;
         // get user token pass in request
-        var requestToken = request.directive.payload.scope.token;
+        //var requestToken = request.directive.payload.scope.token;
         var powerResult;
 
         if (requestMethod === "TurnOn") {
@@ -82,12 +108,13 @@ exports.handler = function (request, context) {
                 "namespace": "Alexa.PowerController",
                 "name": "powerState",
                 "value": powerResult,
-                "timeOfSample": "2017-09-03T16:20:50.52Z", //retrieve from result.
-                "uncertaintyInMilliseconds": 50
+                "timeOfSample": new Date().toISOString(), // "2017-09-03T16:20:50.52Z", //retrieve from result.
+                "uncertaintyInMilliseconds": 500
             }]
         };
         var responseHeader = request.directive.header;
-        responseHeader.name = "Alexa.Response";
+        responseHeader.namespace = "Alexa";
+        responseHeader.name = "Response";
         responseHeader.messageId = responseHeader.messageId + "-R";
         var response = {
             context: contextResult,
@@ -97,7 +124,7 @@ exports.handler = function (request, context) {
             payload: {}
 
         };
-        log("DEBUG", "Alexa.PowerController ", JSON.stringify(response));
+        //log("DEBUG", "Alexa.PowerController ", JSON.stringify(response));
 
 
         // respond with expired token message
@@ -106,18 +133,23 @@ exports.handler = function (request, context) {
         responseHeader.name = "ErrorResponse";
 
         response = {
-            context: {
-                event: {
-                    header: responseHeader,
-                    endpoint: request.directive.endpoint,
-                    payload: {
-                        type: "EXPIRED_AUTHORIZATION_CREDENTIAL",
-                        message: "oAuth token expired"
-                    }
+            event: {
+                //context: contextResult,
+                header: responseHeader,
+                endpoint: request.directive.endpoint,
+                payload: {
+                    type: "EXPIRED_AUTHORIZATION_CREDENTIAL",
+                    //type: "ENDPOINT_LOW_POWER",
+                    //percentageState: 5,
+                    message: "oAuth token expired"
+                    
                 }
             }
-        }
+        };
 
+        delete response.event.endpoint.scope;
+
+        log("DEBUG ", "Alexa.PowerController -  ", JSON.stringify(response));
 
         context.succeed(response);
     }
