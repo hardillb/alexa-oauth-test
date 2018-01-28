@@ -1,0 +1,9 @@
+{
+	"testURL": "https://oauth-test.hardill.me.uk/testing",
+	"authorizationURL": "https://oauth-test.hardill.me.uk/auth/start",
+	"tokenURL": "https://oauth-test.hardill.me.uk/auth/exchange",
+	"clientID": "1",
+	"clientSecret": "password",
+  "scope": "access_devices",
+  "callbackURL": "https://localhost:3001/callback"
+}

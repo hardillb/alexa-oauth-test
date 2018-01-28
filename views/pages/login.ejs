@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title>Login</title>
+</head>
+<body>
+	<% if (this.message) { %>
+    <p><strong><%= message %></strong></p>
+  <% } %>
+  <div id="login">
+    <form method="POST" action="/login">
+      <label style="width: 75px" for="username">Username:</label>
+      <input type="text" id="username" name="username"/>
+      <br>
+      <label style="width: 75px" for="password">Password:</label>
+      <input type="password" id="password" name="password"/>
+      <br>
+      <input type="submit" value="Login">
+    </form>
+  </div>
+</body>
+</html>

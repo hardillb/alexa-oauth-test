@@ -1,0 +1,9 @@
+{
+	"testURL": "https://localhost:3000/testing",
+	"authorizationURL": "https://localhost:3000/auth/start",
+	"tokenURL": "https://localhost:3000/auth/exchange",
+	"clientID": "test",
+	"clientSecret": "password",
+  "scope": "access_devices",
+  "callbackURL": "https://localhost:3001/callback"
+}

@@ -1,0 +1,52 @@
+<html>
+<head>
+	<title>Got Tokens</title>
+</head>
+<body>
+	<button id="test" onclick="test();">Test</button>
+	<button id="renew" onclick="renew()" disabled=true>Renew</button>
+	<div id="log">
+		
+	</div>
+	<script type="application/javascript">
+		var accessToken = '<%= token %>';
+		var button = document.getElementById('renew');
+		var log = document.getElementById('log');
+
+		function test(){
+			var req = new XMLHttpRequest();
+			req.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					console.log("success");
+					log.innerHTML = "success";
+				} else if (this.readyState == 4 && this.status == 401) {
+					console.log("fail");
+					log.innerHTML = "fail";
+					button.disabled = false;
+				}
+			};
+			req.open('GET', '<%= testURL %>');
+			req.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+			req.send();
+		}
+
+		function renew() {
+			var req = new XMLHttpRequest();
+			req.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					console.log("token refreshed");
+					log.innerHTML = "token refreshed";
+					var foo = JSON.parse(this.responseText);
+					accessToken = foo.token;
+					button.disabled = true;
+				} else if (this.readyState == 4) {
+					console.log("problem refreshing token");
+					log.innerHTML = "problem refreshing token";
+				}
+			};
+			req.open('POST', '/refresh');
+			req.send();
+		}
+	</script>
+</body>
+</html>

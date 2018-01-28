@@ -1,0 +1,77 @@
+<html>
+<head>
+	<title>New User</title>
+</head>
+<body>
+	<div id="register">
+		<label style="width: 75px" for="username">Username:</label>
+      <input type="text" onchange="validate()" id="username"/>
+      <span>(can contain any utf-8 chars except /, + or # and must not start with $)</span>
+      <br>
+      <label style="width: 75px" for="email">Email:</label>
+      <input type="email" id="email"/>
+      <br>
+      <label style="width: 75px" for="password">Password:</label>
+      <input type="password" id="password"/>
+      <br>
+      <label style="width: 75px" for="password">Password:</label>
+      <input type="password" id="passwordAgain"/>
+      <br>
+      <button id="registerButton">Register</button>
+      <script type="application/javascript">
+
+      	var xhr = new XMLHttpRequest();
+      	var button = document.getElementById('registerButton');
+
+      	button.onclick = function() {
+      	  var username = document.getElementById('username').value;
+      	  var password = document.getElementById('password').value;
+          var passwordAgain = document.getElementById('passwordAgain').value;
+
+          if (username.length < 1) {
+            alert("Please enter a valid username");
+            return;
+          }
+
+          if (password !== passwordAgain) {
+            alert("Passwords don't match");
+            return;
+          }
+          var email = document.getElementById('email').value;
+          //need to try validate the email address here:
+          if (email.indexOf('@') == -1) {
+            alert("Please enter a valid email address");
+            return;
+          }
+
+      		var params = "username=" + encodeURIComponent(username)
+            + "&password=" + encodeURIComponent(password)
+            + "&email=" + encodeURIComponent(email);
+      		xhr.open('POST', '/newUser',true);
+      		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      		xhr.onreadystatechange = function () {
+      			if( xhr.readyState == 4 && xhr.status == 201) {
+      				//new user created
+      				window.location = '/';
+      			} else if (xhr.readyState == 4 && xhr.status == 400) {
+      				//show error
+      				alert(xhr.responseText);
+      			}
+      		}
+      		
+      		xhr.send(params);
+      	};
+
+        function validate() {
+          var data = document.getElementById('username').value;
+          console.log(data);
+          if (data.indexOf('/') > 0 || data.indexOf('#') > 0 || data.indexOf('+') > 0) {
+            alert("invalid username");
+          } else if (data.indexOf('$') == 0) {
+            alert("invalid username");
+          }
+        }
+      </script>
+	</div>
+</body>
+</html>
