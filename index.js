@@ -274,7 +274,7 @@ app.post('/auth/exchange',function(req,res,next){
 	console.log(req.headers);
 	console.log("Looking for ouath_id = %s",appID);
 
-	oauthModels.Application.findOne({ title: appID, oauth_secret: appSecret }, function(error, application) {
+	oauthModels.Application.findOne({ oauth_id: appID, oauth_secret: appSecret }, function(error, application) {
 		if (application) {
 			console.log("found application - %s", application.title);
 			req.appl = application;
