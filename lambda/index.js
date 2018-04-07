@@ -1,3 +1,5 @@
+var req = require('request');
+
 exports.handler = function (request, context) {
     //log("DEBUG:", "start ", JSON.stringify(request));
     if (request.directive.header.namespace === 'Alexa.Discovery' && request.directive.header.name === 'Discover') {
@@ -78,9 +80,42 @@ exports.handler = function (request, context) {
             }
         };
 
-        log("DEBUG", "ReportState ", JSON.stringify(response));
+        req.get('https://oauth-test.hardill.me.uk/testing', {
+            auth: {
+                'bearer' :requestToken 
+            },
+            timeout: 2000
+        },function(err, response, body){
+            if (response.statusCode == 401) {
+                responseHeader.namespace = "Alexa";
+                responseHeader.name = "ErrorResponse";
 
-        context.succeed(response);
+                response = {
+                    event: {
+                        //context: contextResult,
+                        header: responseHeader,
+                        endpoint: request.directive.endpoint,
+                        payload: {
+                            type: "EXPIRED_AUTHORIZATION_CREDENTIAL",
+                            //type: "ENDPOINT_LOW_POWER",
+                            //percentageState: 5,
+                            message: "oAuth token expired"
+                            
+                        }
+                    }
+                };
+
+                delete response.event.endpoint.scope;
+            }
+
+            log("DEBUG ", "Alexa.PowerController -  ", JSON.stringify(response));
+
+            context.succeed(response);
+        });
+
+        // log("DEBUG", "ReportState ", JSON.stringify(response));
+
+        // context.succeed(response);
         
     }
 
@@ -88,7 +123,7 @@ exports.handler = function (request, context) {
         // get device ID passed in during discovery
         var requestMethod = request.directive.header.name;
         // get user token pass in request
-        //var requestToken = request.directive.payload.scope.token;
+        var requestToken = request.directive.payload.scope.token;
         var powerResult;
 
         if (requestMethod === "TurnOn") {
@@ -112,6 +147,7 @@ exports.handler = function (request, context) {
                 "uncertaintyInMilliseconds": 500
             }]
         };
+
         var responseHeader = request.directive.header;
         responseHeader.namespace = "Alexa";
         responseHeader.name = "Response";
@@ -124,34 +160,42 @@ exports.handler = function (request, context) {
             payload: {}
 
         };
-        //log("DEBUG", "Alexa.PowerController ", JSON.stringify(response));
 
+        req.get('https://oauth-test.hardill.me.uk/testing', {
+            auth: {
+                'bearer' :requestToken 
+            },
+            timeout: 2000
+        },function(err, response, body){
+            if (response.statusCode == 401) {
+                responseHeader.namespace = "Alexa";
+                responseHeader.name = "ErrorResponse";
 
-        // respond with expired token message
+                response = {
+                    event: {
+                        //context: contextResult,
+                        header: responseHeader,
+                        endpoint: request.directive.endpoint,
+                        payload: {
+                            type: "EXPIRED_AUTHORIZATION_CREDENTIAL",
+                            //type: "ENDPOINT_LOW_POWER",
+                            //percentageState: 5,
+                            message: "oAuth token expired"
+                            
+                        }
+                    }
+                };
 
-        responseHeader.namespace = "Alexa";
-        responseHeader.name = "ErrorResponse";
-
-        response = {
-            event: {
-                //context: contextResult,
-                header: responseHeader,
-                endpoint: request.directive.endpoint,
-                payload: {
-                    type: "EXPIRED_AUTHORIZATION_CREDENTIAL",
-                    //type: "ENDPOINT_LOW_POWER",
-                    //percentageState: 5,
-                    message: "oAuth token expired"
-                    
-                }
+                delete response.event.endpoint.scope;
             }
-        };
 
-        delete response.event.endpoint.scope;
+            log("DEBUG ", "Alexa.PowerController -  ", JSON.stringify(response));
 
-        log("DEBUG ", "Alexa.PowerController -  ", JSON.stringify(response));
+            context.succeed(response);
+        });
 
-        context.succeed(response);
+
+        
     }
 };
 

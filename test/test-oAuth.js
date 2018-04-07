@@ -23,7 +23,8 @@ var auth = {
 	}
 };
 
-var config = require('./config.json');
+//var config = require('./config.json');
+var config = require('./config-local.json');
 
 
 if (process.argv.length > 2) {
@@ -63,10 +64,13 @@ var alexStratergy = new OAuth2Strategy({
 	clientID: config.clientID,
 	clientSecret: config.clientSecret,
 	scope: config.scope,
-	callbackURL: config.callbackURL
-}, function(accessToken, refreshToken, profile, callback){
+	callbackURL: config.callbackURL,
+	passReqToCallback: true,
+}, function(req, accessToken, refreshToken, params, profile, callback){
+  console.log(params);
 	profile.accessToken = accessToken;
 	profile.refreshToken = refreshToken;
+	profile.expires = params.expires_in;
 	profile.id = 0;
 	callback(null,profile);
 });
@@ -132,7 +136,8 @@ app.get('/start',
 app.get('/callback',
 	passport.authorize('alexa-node-red'),
 	function(req, res){
-		// console.log("callback part 2");
+		console.log("callback part 2");
+		console.log(req.body);
 		var user = req.user;
 		var account = req.account;
 		user.oauth = account;
