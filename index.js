@@ -200,7 +200,7 @@ app.post('/newuser', function(req,res){
 });
 
 app.get('/auth/start',oauthServer.authorize(function(applicationID, redirectURI,done){
-	oauthModels.Application.findOne({ title: applicationID }, function(error, application) {
+	oauthModels.Application.findOne({ oauth_id: applicationID }, function(error, application) {
 		if (application) {
 			var match = false, uri = url.parse(redirectURI || '');
 			for (var i = 0; i < application.domains.length; i++) {
