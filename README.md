@@ -71,10 +71,10 @@ Create a new Alexa Home Skill
 
 When setting up the "Configuration" section fill in the following values:
  
- - Authorization URL -> https://<domain name>/auth/start
+ - Authorization URL -> https://[domain name]/auth/start
  - ClientId -> 2
  - Scope "access_devices"
- - Access Token URI -> https://<domain name>/auth/exchange
+ - Access Token URI -> https://[domain name]/auth/exchange
  - Client Secret -> "password"
  - Client Authentication Scheme -> "Credentials in request body" 
 
