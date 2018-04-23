@@ -44,7 +44,8 @@ exports.handler = function (request, context) {
                                 "supported": [{
                                     "name": "powerState"
                                 }],
-                                 "retrievable": false
+                                "retrievable": false,
+                                "proactivelyReported": false
                             }
                         }
                     ]
@@ -64,6 +65,7 @@ exports.handler = function (request, context) {
     function reportState(request, context) {
         
         log("DEBUG:", " starting ", JSON.stringify(request));
+        var requestToken = request.directive.endpoint.scope.token;
         
         var responseHeader = request.directive.header;
         responseHeader.namespace = "Alexa";
@@ -85,8 +87,8 @@ exports.handler = function (request, context) {
                 'bearer' :requestToken 
             },
             timeout: 2000
-        },function(err, response, body){
-            if (response.statusCode == 401) {
+        },function(err, resp, body){
+            if (!err && resp.statusCode == 401) {
                 responseHeader.namespace = "Alexa";
                 responseHeader.name = "ErrorResponse";
 
@@ -105,7 +107,7 @@ exports.handler = function (request, context) {
                     }
                 };
 
-                delete response.event.endpoint.scope;
+                //delete response.event.endpoint.scope;
             }
 
             log("DEBUG ", "Alexa.PowerController -  ", JSON.stringify(response));
@@ -123,7 +125,7 @@ exports.handler = function (request, context) {
         // get device ID passed in during discovery
         var requestMethod = request.directive.header.name;
         // get user token pass in request
-        var requestToken = request.directive.payload.scope.token;
+        var requestToken = request.directive.endpoint.scope.token;
         var powerResult;
 
         if (requestMethod === "TurnOn") {
@@ -166,8 +168,8 @@ exports.handler = function (request, context) {
                 'bearer' :requestToken 
             },
             timeout: 2000
-        },function(err, response, body){
-            if (response.statusCode == 401) {
+        },function(err, resp, body){
+            if (!err && resp.statusCode == 401) {
                 responseHeader.namespace = "Alexa";
                 responseHeader.name = "ErrorResponse";
 
@@ -186,7 +188,7 @@ exports.handler = function (request, context) {
                     }
                 };
 
-                delete response.event.endpoint.scope;
+                //delete response.event.endpoint.scope;
             }
 
             log("DEBUG ", "Alexa.PowerController -  ", JSON.stringify(response));
