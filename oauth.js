@@ -63,8 +63,7 @@ server.exchange(oauth2orize.exchange.code({
 					});
 
 					token.save(function(error){
-						//var expires = token.expires -  (new Date().getTime());
-						var expires = Math.round((token.expires -  (new Date().getTime())/1000);
+						var expires = Math.round((token.expires - (new Date().getTime()))/1000);
 						//delete old refreshToken or reuse?
 						OAuth.RefreshToken.findOne({application:application, user: grant.user},function(error, refreshToken){
 							if (refreshToken) {
@@ -104,7 +103,7 @@ server.exchange(oauth2orize.exchange.code({
 			// 	});
 
 			// 	refreshToken.save(function(error){
-			// 		done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'standard' });
+			// 		done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'Bearer' });
 			// 	});
 			// });
 		} else {
