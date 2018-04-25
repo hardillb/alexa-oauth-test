@@ -87,25 +87,6 @@ server.exchange(oauth2orize.exchange.code({
 				}
 			});
 
-			//orginal
-			// var token = new OAuth.AccessToken({
-			// 	application: grant.application,
-			// 	user: grant.user,
-			// 	grant: grant,
-			// 	scope: grant.scope
-			// });
-
-			// token.save(function(error) {
-
-			// 	var refreshToken = new OAuth.RefreshToken({
-			// 		user: grant.user,
-			// 		application: grant.application
-			// 	});
-
-			// 	refreshToken.save(function(error){
-			// 		done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'Bearer' });
-			// 	});
-			// });
 		} else {
 			done(error, false);
 		}
@@ -115,7 +96,7 @@ server.exchange(oauth2orize.exchange.code({
 server.exchange(oauth2orize.exchange.refreshToken({
 	userProperty: 'appl'
 }, function(application, token, scope, done){
-	console.log("Yay!");
+	console.log("Yay! refreshing");
 	OAuth.RefreshToken.findOne({token: token}, function(error, refresh){
 		if (refresh && refresh.application == application.id) {
 			OAuth.GrantCode.findOne({},function(error, grant){
@@ -128,8 +109,9 @@ server.exchange(oauth2orize.exchange.refreshToken({
 					});
 
 					newToken.save(function(error){
+						var expires = Math.round((newToken.expires - (new Date().getTime()))/1000);
 						if (!error) {
-							done(null, newToken.token);
+							done(null, newToken.token, refresh.token, {token_type: 'Bearer', expires_in: expires});
 						} else {
 							done(error,false);
 						}
