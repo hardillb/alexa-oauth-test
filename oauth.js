@@ -67,7 +67,7 @@ server.exchange(oauth2orize.exchange.code({
 						//delete old refreshToken or reuse?
 						OAuth.RefreshToken.findOne({application:application, user: grant.user},function(error, refreshToken){
 							if (refreshToken) {
-								done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'Bearer', expires_in: expires});
+								done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'Bearer', expires_in: expires, scope: token.scope});
 							} else if (!error) {
 								var refreshToken = new OAuth.RefreshToken({
 									user: grant.user,
@@ -75,7 +75,7 @@ server.exchange(oauth2orize.exchange.code({
 								});
 
 								refreshToken.save(function(error){
-									done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'Bearer', expires_in: expires });
+									done(error, error ? null : token.token, refreshToken.token, error ? null : { token_type: 'Bearer', expires_in: expires, scope: token.scope });
 								});
 							} else {
 								done(error);
@@ -105,13 +105,13 @@ server.exchange(oauth2orize.exchange.refreshToken({
 						application: refresh.application,
 						user: refresh.user,
 						grant: grant,
-						scope: scope
+						scope: grant.scope
 					});
 
 					newToken.save(function(error){
 						var expires = Math.round((newToken.expires - (new Date().getTime()))/1000);
 						if (!error) {
-							done(null, newToken.token, refresh.token, {token_type: 'Bearer', expires_in: expires});
+							done(null, newToken.token, refresh.token, {token_type: 'Bearer', expires_in: expires, scope: newToken.scope});
 						} else {
 							done(error,false);
 						}
