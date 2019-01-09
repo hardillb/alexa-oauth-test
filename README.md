@@ -2,7 +2,8 @@
 
 A sample app to test how the Alexa Home Skill system interacts with a oAuth provider.
 
-Everything seams to work apart from getting a new token using the refreshToken. 
+This should make a good base for building a custome Alexa Home Skill in NodeJS.
+
 ## Setup
 
 There are 3 parts to the setup:
@@ -82,7 +83,9 @@ When setting up the "Configuration" section fill in the following values:
 
 Choose "Author from scratch" and pick the Node.js 6.10 runtime and a suitable role. Add the Alexa Smart Home Lambda trigger and fill in the Skill id and copy the Lambda back into the skill.
 
-Copy and past the content of lambda.js into the code section and save.
+ - Run `npm install` in the lambda directory
+ - Run `npm run package` to create the lambda.zip
+ - Upload this file as the source for the lambda
 
 ## Testing
 
